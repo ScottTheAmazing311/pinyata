@@ -1,7 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
+import { readFileSync } from "fs";
 
-const supabaseUrl = "https://ryxrgbvymudmqqpefmmf.supabase.co";
-const serviceKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5eHJnYnZ5bXVkbXFxcGVmbW1mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTIwMzkxMSwiZXhwIjoyMDg2Nzc5OTExfQ.s6HwjZzz10-O68m-7CPkkyYV43kjuojpUp167nIGNzI";
+// Load .env.local
+try {
+  const envFile = readFileSync(".env.local", "utf-8");
+  for (const line of envFile.split("\n")) {
+    const [key, ...rest] = line.split("=");
+    if (key && rest.length) process.env[key.trim()] = rest.join("=").trim();
+  }
+} catch {}
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !serviceKey) {
+  console.error("Missing env vars. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local");
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, serviceKey);
 
