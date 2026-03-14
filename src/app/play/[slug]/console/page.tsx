@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { seedGames } from "@/lib/seedGames";
+import { useGame } from "@/lib/useGames";
 import { useGameEntries } from "@/hooks/useGameEntries";
 import { useScoreTracker } from "@/hooks/useScoreTracker";
 import ContentArea from "@/components/Console/ContentArea";
@@ -16,7 +16,7 @@ export default function ConsolePage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const game = seedGames.find((g) => g.slug === slug);
+  const { game } = useGame(slug);
 
   const { currentEntry, isFlipped, next, flip, progress } = useGameEntries(
     game?.entries ?? []

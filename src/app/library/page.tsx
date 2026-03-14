@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Header from "@/components/Header";
 import GameCard from "@/components/GameCard";
 import SearchBar from "@/components/SearchBar";
-import { seedGames } from "@/lib/seedGames";
+import { useAllGames } from "@/lib/useGames";
 import { getOwnedGameIds, initializeDefaultGames } from "@/lib/localStorage";
 import { GameFile } from "@/types/game";
 import { ChevronRightIcon, BagIcon } from "@/components/Icons";
@@ -16,16 +16,17 @@ type SortOption = "alpha" | "players" | "duration";
 export default function LibraryPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("alpha");
+  const { games: allGames } = useAllGames();
   const [ownedGames, setOwnedGames] = useState<GameFile[]>([]);
 
   useEffect(() => {
-    const defaultIds = seedGames.map((g) => g.id);
+    const defaultIds = allGames.map((g) => g.id);
     initializeDefaultGames(defaultIds);
 
     const ownedIds = getOwnedGameIds();
-    const games = seedGames.filter((g) => ownedIds.includes(g.id));
+    const games = allGames.filter((g) => ownedIds.includes(g.id));
     setOwnedGames(games);
-  }, []);
+  }, [allGames]);
 
   const filteredGames = useMemo(() => {
     let games = ownedGames;

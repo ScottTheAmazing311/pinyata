@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { seedGames } from "@/lib/seedGames";
+import { useGame } from "@/lib/useGames";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import RulesOverlay from "@/components/RulesOverlay";
@@ -17,7 +17,7 @@ const GAME_ICONS: Record<string, React.FC<{ className?: string }>> = {
 export default function StartScreen() {
   const params = useParams();
   const slug = params.slug as string;
-  const game = seedGames.find((g) => g.slug === slug);
+  const { game } = useGame(slug);
   const [showRules, setShowRules] = useState(false);
 
   if (!game) {

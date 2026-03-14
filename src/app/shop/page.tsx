@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Header from "@/components/Header";
 import GameCard from "@/components/GameCard";
 import SearchBar from "@/components/SearchBar";
-import { seedGames } from "@/lib/seedGames";
+import { useAllGames } from "@/lib/useGames";
 import { isGameOwned, addOwnedGame } from "@/lib/localStorage";
 import { formatPrice } from "@/lib/utils";
 import { GameFile } from "@/types/game";
@@ -29,8 +29,9 @@ export default function ShopPage() {
   const [selectedGame, setSelectedGame] = useState<GameFile | null>(null);
   const [justAdded, setJustAdded] = useState<string | null>(null);
 
-  const featured = seedGames.filter((g) => g.is_featured);
-  const allGames = seedGames;
+  const { games: allGamesData } = useAllGames();
+  const featured = allGamesData.filter((g) => g.is_featured);
+  const allGames = allGamesData;
 
   const filteredGames = useMemo(() => {
     let games = allGames;
