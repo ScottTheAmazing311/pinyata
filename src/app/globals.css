@@ -1,26 +1,168 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-plum-100: #f3e8ff;
+  --color-plum-200: #e0c4ff;
+  --color-plum-300: #c49deb;
+  --color-plum-400: #a374d1;
+  --color-plum-500: #7e4fb8;
+  --color-plum-600: #63399a;
+  --color-plum-700: #49277d;
+  --color-plum-800: #321860;
+  --color-plum-900: #1a0d33;
+  --color-plum-950: #0d0619;
+
+  --color-coral-300: #fda4af;
+  --color-coral-400: #fb7185;
+  --color-coral-500: #f43f5e;
+  --color-coral-600: #e11d48;
+
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+
+  --font-sans: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html, body {
+  overscroll-behavior: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-plum-950);
+  color: white;
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Smooth scrolling */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Animated mesh background */
+@keyframes mesh-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.05); }
+  50% { transform: translate(-10px, 20px) scale(0.95); }
+  75% { transform: translate(-30px, -10px) scale(1.02); }
+}
+
+.mesh-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.mesh-bg::before,
+.mesh-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.mesh-bg::before {
+  width: 300px;
+  height: 300px;
+  top: -50px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.12) 0%, transparent 70%);
+  animation: mesh-drift 12s ease-in-out infinite;
+}
+
+.mesh-bg::after {
+  width: 250px;
+  height: 250px;
+  bottom: 10%;
+  left: -60px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  animation: mesh-drift 15s ease-in-out infinite reverse;
+}
+
+/* Noise texture overlay */
+.noise-overlay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 100;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(50, 24, 96, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(73, 39, 125, 0.4);
+}
+
+/* Animated gradient border */
+@keyframes border-rotate {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 40%,
+    rgba(244, 63, 94, 0.5) 50%,
+    rgba(251, 191, 36, 0.3) 55%,
+    transparent 65%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  animation: border-rotate 6s linear infinite;
+  pointer-events: none;
+}
+
+/* Pulse ring animation for play button */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(244, 63, 94, 0.5);
+  animation: pulse-ring 2s ease-out infinite;
 }
