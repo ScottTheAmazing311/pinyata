@@ -1,7 +1,38 @@
 import { supabase } from "./client";
-import { GameFile, GameEntry } from "@/types/game";
+import { GameFile } from "@/types/game";
+
+function mapGame(g: Record<string, unknown>, entries: Record<string, unknown>[]): GameFile {
+  return {
+    id: g.id as string,
+    slug: g.slug as string,
+    title: g.title as string,
+    description: g.description as string,
+    thumbnail_url: (g.thumbnail_url as string) ?? "",
+    min_players: g.min_players as number,
+    max_players: g.max_players as number,
+    duration_minutes: g.duration_minutes as number,
+    tags: (g.tags as string[]) ?? [],
+    price: g.price as number,
+    is_featured: g.is_featured as boolean,
+    timer_default_seconds: (g.timer_default_seconds as number) ?? 0,
+    randomizer_type: g.randomizer_type as GameFile["randomizer_type"],
+    randomizer_config: g.randomizer_config as Record<string, number> | undefined,
+    rules: (g.rules as string) ?? "",
+    entries: entries.map((e) => ({
+      id: e.id as string,
+      primary: e.primary_content as string,
+      secondary: (e.secondary_content as string) ?? undefined,
+      category: (e.category as string) ?? undefined,
+      image_url: (e.image_url as string) ?? undefined,
+    })),
+    created_at: g.created_at as string,
+    updated_at: g.updated_at as string,
+  };
+}
 
 export async function fetchAllGames(): Promise<GameFile[]> {
+  if (!supabase) return [];
+
   const { data: games, error } = await supabase
     .from("games")
     .select("*")
@@ -17,37 +48,14 @@ export async function fetchAllGames(): Promise<GameFile[]> {
     .in("game_id", gameIds)
     .order("sort_order");
 
-  return games.map((g) => ({
-    id: g.id,
-    slug: g.slug,
-    title: g.title,
-    description: g.description,
-    thumbnail_url: g.thumbnail_url ?? "",
-    min_players: g.min_players,
-    max_players: g.max_players,
-    duration_minutes: g.duration_minutes,
-    tags: g.tags ?? [],
-    price: g.price,
-    is_featured: g.is_featured,
-    timer_default_seconds: g.timer_default_seconds ?? 0,
-    randomizer_type: g.randomizer_type,
-    randomizer_config: g.randomizer_config,
-    rules: g.rules ?? "",
-    entries: (entries ?? [])
-      .filter((e) => e.game_id === g.id)
-      .map((e) => ({
-        id: e.id,
-        primary: e.primary_content,
-        secondary: e.secondary_content ?? undefined,
-        category: e.category ?? undefined,
-        image_url: e.image_url ?? undefined,
-      })),
-    created_at: g.created_at,
-    updated_at: g.updated_at,
-  }));
+  return games.map((g) =>
+    mapGame(g, (entries ?? []).filter((e) => e.game_id === g.id))
+  );
 }
 
 export async function fetchGameBySlug(slug: string): Promise<GameFile | null> {
+  if (!supabase) return null;
+
   const { data: game, error } = await supabase
     .from("games")
     .select("*")
@@ -63,30 +71,5 @@ export async function fetchGameBySlug(slug: string): Promise<GameFile | null> {
     .eq("game_id", game.id)
     .order("sort_order");
 
-  return {
-    id: game.id,
-    slug: game.slug,
-    title: game.title,
-    description: game.description,
-    thumbnail_url: game.thumbnail_url ?? "",
-    min_players: game.min_players,
-    max_players: game.max_players,
-    duration_minutes: game.duration_minutes,
-    tags: game.tags ?? [],
-    price: game.price,
-    is_featured: game.is_featured,
-    timer_default_seconds: game.timer_default_seconds ?? 0,
-    randomizer_type: game.randomizer_type,
-    randomizer_config: game.randomizer_config,
-    rules: game.rules ?? "",
-    entries: (entries ?? []).map((e) => ({
-      id: e.id,
-      primary: e.primary_content,
-      secondary: e.secondary_content ?? undefined,
-      category: e.category ?? undefined,
-      image_url: e.image_url ?? undefined,
-    })),
-    created_at: game.created_at,
-    updated_at: game.updated_at,
-  };
+  return mapGame(game, entries ?? []);
 }
